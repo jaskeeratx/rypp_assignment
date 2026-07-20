@@ -1,232 +1,365 @@
-# RideOn — Bike & Scooter Rental Marketplace
+# RideOn - Bike & Scooter Rental Marketplace
 
-A production-quality Flutter application for browsing, searching, and booking
-bikes & scooters. Built with clean architecture, Provider state management,
-and Material 3.
+RideOn is a modern Flutter application that simulates a Bike & Scooter Rental Marketplace. It includes user authentication, product browsing, search, sorting, detailed product pages, and a complete booking flow. The application is built using clean architecture principles with Provider for state management and Material 3 design.
 
 ---
 
-## 1. Project Overview
+# Features
 
-RideOn simulates a real rental marketplace: users log in with a mobile
-number + OTP, browse a catalog of vehicles (sourced from
-[fakestoreapi.com](https://fakestoreapi.com/products) and remapped into
-rental-domain terms), search and sort the catalog, view details, and complete
-a date-range booking with a computed total cost.
+### Authentication
+- Mobile Number Login
+- Dummy OTP Verification (`123456`)
+- Login Session Persistence using SharedPreferences
+- Auto Login via Splash Screen
+- Logout Support
 
-The codebase is organized to mirror how a real product team would structure
-a mid-size Flutter app: a `core/` layer for cross-cutting concerns, a
-`services/` layer that isolates I/O (network + local storage), `providers/`
-that hold all business logic and app state, and `screens/`/`widgets/` that
-are "dumb" — they only render state and forward user intent to providers.
+### Home Screen
+- Fetches products from Fake Store API
+- Bike Image
+- Bike Name
+- Rental Price per Day
+- Rating
+- Availability Status
+- Pull to Refresh
 
-## 2. Features
+### Search & Sorting
+- Live Search by Bike Name
+- Sort by Price (Low → High)
+- Sort by Price (High → Low)
+- Sort by Rating
 
-- **Authentication** — mobile number entry, OTP verification (dummy code
-  `123456`), persisted session via `SharedPreferences`, and logout.
-- **Splash flow** — checks login state on launch and routes to Home or
-  Login accordingly.
-- **Catalog (Home)** — live search-as-you-type, sort by price (asc/desc)
-  and rating, pull-to-refresh, skeleton loading state, error state with
-  retry, and empty state.
-- **Bike Details** — Hero image transition, rating, description, price,
-  availability, and a Book Now CTA (disabled when unavailable).
-- **Booking** — pickup/return date pickers, validation (return ≥ pickup),
-  live total-days and total-cost calculation.
-- **Booking Success** — animated confirmation screen with a way back Home.
-- **Robust error handling** — no internet, request timeout, server errors,
-  invalid OTP, and empty results are all handled with user-facing messages.
+### Bike Details
+- Large Bike Image
+- Description
+- Rating
+- Daily Rental Price
+- Availability
+- Hero Animation
+- Book Now Button
 
-## 3. Folder Structure
+### Booking
+- Pickup Date Selection
+- Return Date Selection
+- Booking Validation
+- Total Rental Days
+- Total Rental Cost Calculation
+
+### Booking Success
+- Success Animation
+- Navigate Back to Home
+
+### Error Handling
+- Loading State
+- Empty State
+- Network Error Handling
+- Timeout Handling
+- Invalid OTP Handling
+
+---
+
+# Tech Stack
+
+- Flutter (Latest Stable)
+- Dart (Null Safety)
+- Provider
+- Dio
+- SharedPreferences
+- CachedNetworkImage
+- Intl
+- Material 3
+
+---
+
+# Project Structure
 
 ```text
 lib/
-├── main.dart                  # App entry point, DI wiring, MaterialApp
+│
+├── main.dart
+│
 ├── core/
-│   ├── constants/              # App-wide strings & config constants
-│   ├── theme/                  # Material 3 theme + color palette
-│   ├── utils/                  # Validators, date helpers, extensions
-│   └── widgets/                # Low-level shared widgets (skeleton loader)
+│   ├── constants/
+│   ├── theme/
+│   ├── utils/
+│   └── widgets/
+│
 ├── models/
-│   └── product_model.dart      # Bike/scooter domain model
+│   └── product_model.dart
+│
 ├── services/
-│   ├── api_service.dart        # Dio-based networking
-│   ├── auth_service.dart       # Login/OTP/logout business rules
-│   └── storage_service.dart    # SharedPreferences wrapper
+│   ├── api_service.dart
+│   ├── auth_service.dart
+│   └── storage_service.dart
+│
 ├── providers/
 │   ├── auth_provider.dart
 │   ├── product_provider.dart
 │   └── booking_provider.dart
+│
 ├── screens/
-│   ├── splash/  login/  otp/  home/  details/  booking/  success/
-├── widgets/                    # Feature-level reusable widgets
-│   ├── bike_card.dart  custom_button.dart  custom_search_bar.dart
-│   ├── rating_widget.dart  loading_widget.dart  empty_widget.dart
+│   ├── splash/
+│   ├── login/
+│   ├── otp/
+│   ├── home/
+│   ├── details/
+│   ├── booking/
+│   └── success/
+│
+├── widgets/
+│   ├── bike_card.dart
+│   ├── custom_button.dart
+│   ├── custom_search_bar.dart
+│   ├── rating_widget.dart
+│   ├── loading_widget.dart
+│   ├── empty_widget.dart
 │   └── error_widget.dart
+│
 └── routes/
-    └── app_routes.dart         # Named routes + route generator
+    └── app_routes.dart
 ```
 
-## 4. Packages Used
+---
 
-| Package               | Purpose                                   |
-|------------------------|-------------------------------------------|
-| `provider`             | State management                          |
-| `dio`                  | HTTP client for the products API          |
-| `shared_preferences`   | Persisting login session locally          |
-| `cached_network_image` | Efficient, cached image loading           |
-| `intl`                 | Date formatting                           |
-| `flutter_lints` (dev)  | Static analysis / linting                 |
+# Architecture
 
-No other dependencies are used — animations, shimmer effects, and the
-"connection error" case are all implemented with Flutter's own APIs
-(`AnimationController`, `Hero`, `DioExceptionType.connectionError`) to keep
-the dependency graph minimal.
+The project follows a layered architecture.
 
-## 5. How to Run
+```
+UI (Screens & Widgets)
+        │
+        ▼
+Providers (Business Logic & State)
+        │
+        ▼
+Services (API & Local Storage)
+        │
+        ▼
+Network / SharedPreferences
+```
 
-This repository ships the Dart/Flutter source (`lib/`) and `pubspec.yaml`.
-Platform folders (`android/`, `ios/`, etc.) are intentionally not included —
-generate them once locally, then drop this `lib/` folder in:
+### State Management
+
+The application uses **Provider** with `ChangeNotifier`.
+
+Providers:
+
+- AuthProvider
+- ProductProvider
+- BookingProvider
+
+Each provider manages its own business logic and notifies the UI using `notifyListeners()`.
+
+---
+
+# API
+
+Products are fetched from:
+
+https://fakestoreapi.com/products
+
+The response is mapped into rental-related data.
+
+| API Field | App Field |
+|-----------|-----------|
+| title | Bike Name |
+| image | Bike Image |
+| price | Rental Price |
+| description | Description |
+| rating.rate | Rating |
+
+Availability is generated locally for demonstration purposes.
+
+---
+
+# Packages Used
+
+| Package | Purpose |
+|---------|---------|
+| provider | State Management |
+| dio | API Requests |
+| shared_preferences | Store Login Session |
+| cached_network_image | Image Caching |
+| intl | Date Formatting |
+| flutter_lints | Static Analysis |
+
+---
+
+# Screens
+
+- Splash Screen
+- Login Screen
+- OTP Verification
+- Home Screen
+- Bike Details Screen
+- Booking Screen
+- Booking Success Screen
+
+---
+
+# Screenshots
+
+| Login | OTP | Home |
+|-------|-----|------|
+| ![](screenshots/1.jpeg) | ![](screenshots/9.jpeg) | ![](screenshots/2.jpeg) |
+
+| Details | Booking | Success |
+|----------|----------|----------|
+| ![](screenshots/5.jpeg) | ![](screenshots/6.jpeg) | ![](screenshots/7.jpeg) |
+
+---
+
+# Getting Started
+
+## Clone Repository
 
 ```bash
-# 1. Scaffold platform folders (only needed once)
-flutter create .
+git clone <repository-url>
+```
 
-# 2. Install dependencies
+## Navigate to Project
+
+```bash
+cd rideon
+```
+
+## Install Dependencies
+
+```bash
 flutter pub get
+```
 
-# 3. Run static analysis (optional but recommended)
-flutter analyze
+## Run Application
 
-# 4. Run the app
+```bash
 flutter run
-```![1.jpeg](screenshots/1.jpeg)
-   ![9.jpeg](screenshots/9.jpeg)
-   ![2.jpeg](screenshots/2.jpeg)
-   ![3.jpeg](screenshots/3.jpeg)
-   ![4.jpeg](screenshots/4.jpeg)
-   ![5.jpeg](screenshots/5.jpeg)
-   ![6.jpeg](screenshots/6.jpeg)
-   ![7.jpeg](screenshots/7.jpeg)
-   ![8.jpeg](screenshots/8.jpeg)
-   ![9.jpeg](screenshots/9.jpeg)
-> If `flutter create .` overwrites `pubspec.yaml`, re-copy the one from this
-> repo before running `flutter pub get`.
+```
 
-## 6. Screenshots
+---
 
-
-
-| Login | OTP | Home | Details | Booking | Success |
-|-------|-----|------|---------|---------|---------|
-| ![login](screenshots/login.png) | ![otp](screenshots/otp.png) | ![home](screenshots/home.png) | ![details](screenshots/details.png) | ![booking](screenshots/booking.png) | ![success](screenshots/success.png) |
-
-## 7. APK Build Command
+# Build Release APK
 
 ```bash
 flutter build apk --release
 ```
 
-The generated APK will be located at:
-`build/app/outputs/flutter-apk/app-release.apk`
-
-## 8. Git Commands
-
-```bash
-git init
-git add .
-git commit -m "Initial project setup"
-git branch -M main
-git remote add origin <your-repo-url>
-git push -u origin main
-```
-
-### Suggested commit history
-
-1. `chore: initial project setup and folder structure`
-2. `feat: add core theme, colors, constants and utils`
-3. `feat: add product model and API service with Dio`
-4. `feat: implement authentication (login + OTP) flow`
-5. `feat: add AuthProvider and storage service integration`
-6. `feat: implement splash screen with auto-navigation`
-7. `feat: build home screen with product listing`
-8. `feat: add search and sort functionality`
-9. `feat: implement bike details screen with Hero animation`
-10. `feat: implement booking flow with date validation`
-11. `feat: add booking success screen with animation`
-12. `fix: handle API errors, timeouts and empty states`
-13. `style: polish UI, spacing, and card shadows`
-14. `docs: add README with setup and architecture notes`
-
-## 9. Architecture, State & API Flow (Interview Notes)
-
-### Layered architecture
+Generated APK:
 
 ```
-Screens (UI)  →  Providers (state + business logic)  →  Services (I/O)
-     ↑                     ↓
-     └────── Consumer/Selector rebuilds on notifyListeners() ──────┘
+build/app/outputs/flutter-apk/app-release.apk
 ```
 
-- **Screens/Widgets** never call `Dio` or `SharedPreferences` directly. They
-  read state via `Consumer<T>` / `context.watch<T>()` and call methods on a
-  provider via `context.read<T>()`.
-- **Providers** (`ChangeNotifier`) hold UI state (loading/success/error,
-  search query, sort option, selected dates, etc.) and orchestrate calls to
-  services. They call `notifyListeners()` after every state change.
-- **Services** are the only layer that touches the network or local
-  storage: `ApiService` (Dio), `StorageService` (SharedPreferences),
-  `AuthService` (business rules on top of storage).
+---
 
-### Dependency injection
+# State Flow
 
-`main.dart` wires everything with `MultiProvider`:
-- `StorageService` and `ApiService` are provided as plain `Provider`s.
-- `AuthService` is built from `StorageService` via `ProxyProvider`.
-- `AuthProvider` and `ProductProvider` are `ChangeNotifierProxyProvider`s
-  built from their respective services, so screens simply do
-  `context.watch<AuthProvider>()` without knowing how it was constructed.
-- `BookingProvider` has no service dependency (booking is simulated), so
-  it's a plain `ChangeNotifierProvider`.
+```
+Splash
+      │
+      ▼
+Check Login
+      │
+      ▼
+Login → OTP
+      │
+      ▼
+Home
+      │
+      ▼
+Bike Details
+      │
+      ▼
+Booking
+      │
+      ▼
+Success
+```
 
-### App/state flow
+---
 
-1. **Splash** calls `AuthProvider.checkLoginStatus()`, which asks
-   `AuthService.isLoggedIn()` (backed by `StorageService`), and routes to
-   Home or Login.
-2. **Login → OTP**: `AuthProvider.sendOtp()` simulates sending a code;
-   `AuthProvider.verifyOtp()` compares the entered code against the dummy
-   OTP and, on success, persists the session and flips `isLoggedIn`.
-3. **Home**: on first build, `ProductProvider.fetchProducts()` calls
-   `ApiService.fetchProducts()`, which hits `GET /products` on
-   fakestoreapi.com via Dio, maps each JSON item to a `ProductModel`
-   (remapping `title → bikeName`, `price → dailyRentalPrice`, deriving
-   `isAvailable` from the item's index), and stores the state as
-   `loading → loaded` or `loading → error`. `filteredProducts` is a
-   computed getter that applies the current search query and sort option
-   without re-fetching.
-4. **Details → Booking**: the tapped `ProductModel` is passed as a route
-   argument (no re-fetching). `BookingProvider` calculates `totalDays` and
-   `totalCost` reactively as the user picks pickup/return dates, and
-   validates that the return date isn't before the pickup date.
-5. **Success**: `BookingProvider.confirmBooking()` simulates a booking
-   request and flips `bookingConfirmed`; the screen then clears the
-   navigation stack back to Home.
+# Error Handling
 
-### Error handling strategy
+The application handles:
 
-`ApiService` translates every `DioException` into a typed `ApiException`
-(`noInternet`, `timeout`, `server`, `unknown`) with a user-friendly message.
-`ProductProvider` surfaces that message through `errorMessage`, and the
-`AppErrorWidget` shows it with a Retry button that re-triggers
-`fetchProducts()`.
+- No Internet Connection
+- API Timeout
+- Server Errors
+- Invalid OTP
+- Empty Product List
+- Image Loading Errors
 
-## 10. Future Improvements
+---
 
-- Replace the simulated booking/auth backends with real endpoints.
-- Add a "My Bookings" screen backed by local persistence or a backend.
-- Add unit tests for providers/services and widget tests for key screens.
-- Add pagination/infinite scroll if the catalog grows large.
-- Add dark theme support via a second `ColorScheme`.
-- Add map-based vehicle discovery (nearby bikes/scooters).
+# Future Improvements
+
+- Firebase Authentication
+- Real OTP Verification
+- Real Booking Backend
+- Payment Gateway Integration
+- Google Maps Integration
+- Dark Mode
+- Favorites
+- Booking History
+- Unit & Widget Testing
+
+---
+
+# Git Commit History
+
+Example commit sequence:
+
+- Initial Flutter project setup
+- Setup clean folder structure
+- Implement authentication flow
+- Integrate Fake Store API
+- Add Provider state management
+- Implement search functionality
+- Add sorting feature
+- Build booking flow
+- Improve UI & animations
+- Update README
+
+---
+
+# Assignment Requirements Covered
+
+✅ Mobile Login
+
+✅ Dummy OTP Verification
+
+✅ Local Login Persistence
+
+✅ Splash Screen
+
+✅ Product API Integration
+
+✅ Search
+
+✅ Sorting
+
+✅ Product Details
+
+✅ Booking Flow
+
+✅ Success Screen
+
+✅ Loading State
+
+✅ Error State
+
+✅ Empty State
+
+✅ Pull to Refresh
+
+✅ Cached Images
+
+✅ Material 3 UI
+
+✅ Provider State Management
+
+---
+
+## Author
+
+**Jaskeerat Singh**
+
+Flutter Developer
